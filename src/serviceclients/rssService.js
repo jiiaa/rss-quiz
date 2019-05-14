@@ -10,6 +10,5 @@ export default async function getRSSFeed(callback) {
     feed.items.forEach(item => {
         rssFeed.push(item.title)
     })
-    console.log("rssFeed: ", rssFeed);
     callback (rssFeed);
 };

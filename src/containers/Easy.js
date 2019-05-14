@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { MDBBadge, MDBBtn } from "mdbreact";
 import Latency from '../components/Latency';
-// import AnswerTitle from '../components/AnswerTitle';
+import AnswerTitle from '../components/AnswerTitle';
 import getRSSFeed from '../serviceclients/rssService';
 import './styles/easy.css';
 
@@ -52,7 +52,7 @@ export default class Easy extends Component {
     cacheTitleArray.forEach((item, index) => {
       randomTitleArray.push({index: index, word: item });
     });
-    referenceResult = randomTitleArray;
+    referenceResult = [...randomTitleArray];
     randomIndexes = this.getRandomIndexes(randomTitleArray.length);
     for (let i=0; i<randomIndexes.length; ++i) {
       const hiddenWord = (randomTitleArray.splice(randomIndexes[i], 1, {index: i, word: "hidden"}));
@@ -79,7 +79,6 @@ export default class Easy extends Component {
     let word = event.dataTransfer.getData("word");
     let index = event.dataTransfer.getData("indexInArray");
     let isWords = event.dataTransfer.getData("isWords");
-    console.log(isWords);
     if (isWords === "true") {
       title[ind] = { index: indexWord, word: word };
       words.splice(index, 1);
@@ -113,9 +112,6 @@ export default class Easy extends Component {
 
   checkResult = () => {
     let userAnswer = [...this.state.title];
-    console.log("Reference: ", referenceResult);
-    console.log("userAnswer: ", userAnswer);
-
     for (let i=0; i<randomIndexes.length; ++i) {
       if (userAnswer[randomIndexes[i]].word === referenceResult[randomIndexes[i]].word) {
         userAnswer[randomIndexes[i]].index = 88;
@@ -123,7 +119,7 @@ export default class Easy extends Component {
         userAnswer[randomIndexes[i]].index = 99;
       }
     }
-    this.setState({ title: userAnswer, isAnswer: true });
+    this.setState({ title: userAnswer, words: [], isAnswer: true });
   }
 
   // renderQuizTitle() {
@@ -135,13 +131,13 @@ export default class Easy extends Component {
   //   )
   // }
 
-  // renderAnswerTitle() {
-  //   return(
-  //     <QuizTitle
-  //       title={this.state.title}
-  //     />
-  //   )
-  // }
+  renderAnswerTitle() {
+    return(
+      <AnswerTitle
+        title={this.state.title}
+      />
+    )
+  }
 
   render() {
 
@@ -176,6 +172,9 @@ export default class Easy extends Component {
         <br />
         <p>
           {quizTitle}
+        </p>
+        <p>
+          {this.state.isAnswer && this.renderAnswerTitle()}
         </p>
         <p>
           {quizWord}
