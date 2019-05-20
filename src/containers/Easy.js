@@ -1,12 +1,19 @@
 import React, { Component } from 'react'
-import { MDBBadge, MDBBtn } from "mdbreact";
+import { MDBBadge, MDBCol, MDBContainer, MDBRow } from 'mdbreact';
 import Latency from '../components/Latency';
 import AnswerTitle from '../components/AnswerTitle';
-import getRSSFeed from '../serviceclients/rssService';
+import NewsMenu from '../components/NewsMenu';
+import ResultScore from '../components/ResultScore';
+import { yleMajorNews, yleMostRead, yleFinancial, yleNewsInEnglish } from '../serviceclients/rssService';
 import './styles/easy.css';
+import '../containers/styles/components.css';
 
+let allTitles = [];
 let referenceResult = [];
 let randomIndexes = [];
+let totalScore = 0;
+let userScore = 0;
+
 const spanStyle = {
   backgroundColor: "lightblue",
   margin: "2px",
@@ -16,27 +23,53 @@ const spanStyle = {
 export default class Easy extends Component {
   state = {
     isAnswer: false,
+    resultScore: 0,
     spinner: false,
     title: [],
     words: [],
   };
 
- componentDidMount() {
-    this.getNewsTitles();
+  componentDidMount() {
+  //   this.getNewsTitles();
   }
 
-  getNewsTitles() {
-    this.setState({ spinner: !this.state.spinner });
-    getRSSFeed(response => {
-      this.getQuizTitle(response);
+  getYleMajorNews = e => {
+    this.setState({ title: [], words: [], spinner: true });
+    yleMajorNews(response => {
+      allTitles = response;
+      this.getQuizTitle();
     })
-  }
+  };
+
+  getYleMostRead = e => {
+    this.setState({ title: [], words: [], spinner: true });
+    yleMostRead(response => {
+      allTitles = response;
+      this.getQuizTitle();
+    })
+  };
+
+  getYleFinancial = e => {
+    this.setState({ title: [], words: [], spinner: true });
+    yleFinancial(response => {
+      allTitles = response;
+      this.getQuizTitle();
+    })
+  };
+
+  getYleInEnglish = e => {
+    this.setState({ title: [], words: [], spinner: true });
+    yleNewsInEnglish(response => {
+      allTitles = response;
+      this.getQuizTitle();
+    })
+  };
 
   getRandomIndexes = (amount) => {
     let rndIndexes = [];
     let randomNumber;
-    for(let i=0; rndIndexes.length < (Math.floor(amount/3)); ++i) {
-      randomNumber = (Math.floor(Math.random()*(amount-1)));
+    for (let i = 0; rndIndexes.length < (Math.floor(amount / 3)); ++i) {
+      randomNumber = (Math.floor(Math.random() * (amount - 1)));
       if (rndIndexes.indexOf(randomNumber) === -1) {
         rndIndexes.push(randomNumber);
       }
@@ -44,21 +77,22 @@ export default class Easy extends Component {
     return rndIndexes
   }
 
-  getQuizTitle = (titles) => {
+  getQuizTitle = () => {
     let hiddenWords = [];
     let randomTitleArray = [];
-    let randomIndex = Math.floor(Math.random()*titles.length);
-    let cacheTitleArray = titles[randomIndex].split(" ");
+    let randomIndex = Math.floor(Math.random() * allTitles.length);
+    let cache = allTitles.splice(randomIndex, 1);
+    let cacheTitleArray = cache[0].split(" ");
     cacheTitleArray.forEach((item, index) => {
-      randomTitleArray.push({index: index, word: item });
+      randomTitleArray.push({ index: index, word: item });
     });
     referenceResult = [...randomTitleArray];
     randomIndexes = this.getRandomIndexes(randomTitleArray.length);
-    for (let i=0; i<randomIndexes.length; ++i) {
-      const hiddenWord = (randomTitleArray.splice(randomIndexes[i], 1, {index: i, word: "hidden"}));
+    for (let i = 0; i < randomIndexes.length; ++i) {
+      const hiddenWord = (randomTitleArray.splice(randomIndexes[i], 1, { index: i, word: "empty" }));
       hiddenWords.push(hiddenWord[0]);
     }
-    this.setState({ title: randomTitleArray, words: hiddenWords, spinner: !this.state.spinner });
+    this.setState({ title: randomTitleArray, words: hiddenWords, spinner: false, isAnswer: false });
   }
 
   onDragStart = (event, word, index, value) => {
@@ -73,7 +107,7 @@ export default class Easy extends Component {
   }
 
   onDropHidden = (event, ind) => {
-    let title = [...this.state.title ];
+    let title = [...this.state.title];
     let words = [...this.state.words];
     let indexWord = event.dataTransfer.getData("indexWord");
     let word = event.dataTransfer.getData("word");
@@ -85,7 +119,7 @@ export default class Easy extends Component {
       this.setState({ title, words });
     } else {
       title[ind] = { index: indexWord, word: word };
-      title[index] = { index: indexWord, word: "hidden" };
+      title[index] = { index: indexWord, word: "empty" };
       this.setState({ title });
     }
   }
@@ -104,7 +138,7 @@ export default class Easy extends Component {
       words.push(cacheWord);
       this.setState({ title, words });
     } else {
-      title[index] = { index: index, word: "hidden" };
+      title[index] = { index: index, word: "empty" };
       words.push(cacheWord);
       this.setState({ title, words });
     }
@@ -112,29 +146,42 @@ export default class Easy extends Component {
 
   checkResult = () => {
     let userAnswer = [...this.state.title];
-    for (let i=0; i<randomIndexes.length; ++i) {
+    for (let i = 0; i < randomIndexes.length; ++i) {
       if (userAnswer[randomIndexes[i]].word === referenceResult[randomIndexes[i]].word) {
         userAnswer[randomIndexes[i]].index = 88;
+        userScore++;
+        totalScore++;
       } else {
         userAnswer[randomIndexes[i]].index = 99;
+        totalScore++;
       }
     }
     this.setState({ title: userAnswer, words: [], isAnswer: true });
   }
 
-  // renderQuizTitle() {
-  //   return(
-  //     <AnswerTitle
-  //       title={this.state.title}
-  //       words={this.state.words}
-  //     />
-  //   )
-  // }
-
+  renderNewsMenu() {
+    return (
+      <NewsMenu
+        yleMajorNews={this.getYleMajorNews}
+        yleMostRead={this.getYleMostRead}
+        yleFinancial={this.getYleFinancial}
+        yleInEnglish={this.getYleInEnglish}
+      />
+    )
+  }
   renderAnswerTitle() {
-    return(
+    return (
       <AnswerTitle
         title={this.state.title}
+      />
+    )
+  }
+
+  renderResultScore(uScore, tScore) {
+    return (
+      <ResultScore
+        userScore={uScore}
+        totalScore={tScore}
       />
     )
   }
@@ -142,7 +189,7 @@ export default class Easy extends Component {
   render() {
 
     let quizTitle = this.state.title.map((t, index) => {
-      if (t.word === "hidden") {
+      if (t.word === "empty") {
         return <span key={index}
           onDragOver={(e) => this.onDragOver(e)}
           onDrop={(e) => this.onDropHidden(e, index)}
@@ -150,12 +197,12 @@ export default class Easy extends Component {
           *****&nbsp;
           </span>
       } else if (randomIndexes.indexOf(index) !== -1) {
-          return <MDBBadge key={index}
-            onDragStart={(e) => this.onDragStart(e, t, index, false)}
-            onDragOver={(e) => this.onDragOver(e)}
-            onDrop={(e) => this.onDropInWord(e, index)}
-            draggable>
-            {t.word}&nbsp;
+        return <MDBBadge key={index}
+          onDragStart={(e) => this.onDragStart(e, t, index, false)}
+          onDragOver={(e) => this.onDragOver(e)}
+          onDrop={(e) => this.onDropInWord(e, index)}
+          draggable>
+          {t.word}&nbsp;
             </MDBBadge>
       } else {
         return <span key={index}>{t.word}&nbsp;</span>
@@ -168,18 +215,34 @@ export default class Easy extends Component {
 
     return (
       <>
-        {this.state.spinner ? <Latency/> : <span>Otsikko: </span> }
-        <br />
-        <p>
-          {quizTitle}
-        </p>
-        <p>
-          {this.state.isAnswer && this.renderAnswerTitle()}
-        </p>
-        <p>
-          {quizWord}
-        </p>
-        <MDBBtn color="indigo" onClick={() => this.checkResult()}>Verify & Next</MDBBtn>
+        <MDBContainer>
+          <MDBRow>
+            <MDBCol>
+              <div>{this.renderNewsMenu()}</div>
+            </MDBCol>
+            <MDBCol size="8">
+              {this.state.spinner ? <Latency />
+                : <>{this.state.isAnswer ? <div><span className="head">Quiz Result</span></div> : <div><span className="head">Quiz News Title</span></div>}</>
+              }
+              {this.state.isAnswer
+                ? this.renderAnswerTitle()
+                : <div>
+                  <p>{quizTitle}</p>
+                  <p>{quizWord}</p>
+                </div>
+              }
+              <div>
+                {this.state.isAnswer
+                  ? <button onClick={() => this.getQuizTitle()}>Next</button>
+                  : <button color="info" onClick={() => this.checkResult()}>Verify</button>
+                }
+              </div>
+            </MDBCol>
+            <MDBCol>
+              <div>{this.renderResultScore(userScore, totalScore)}</div>
+            </MDBCol>
+          </MDBRow>
+        </MDBContainer>
       </>
     )
   }

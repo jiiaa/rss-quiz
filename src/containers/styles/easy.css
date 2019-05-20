@@ -1,3 +1,11 @@
 .badge {
     margin: 3px;
 }
+
+button {
+    color: white;
+    background-color: rgb(101, 98, 238);
+    margin: 5px;
+    padding: 4px;
+    border-radius: 4px;
+}

@@ -7,13 +7,13 @@ const AnswerTitle = props => {
         <>
             {title.map((t, index) => {
                 if (t.index === 88) {
-                    return <span key={index}
+                    return <span className="badge badbe-pill badge-success" key={index}
                             style={{backgroundColor: "lightgreen"}}
                             >
                                 {t.word}&nbsp;
                             </span>
                 } else if (t.index === 99) {
-                    return <span key={index}
+                    return <span className="badge badbe-pill badge-danger" key={index}
                             style={{backgroundColor: "red"}}
                             >
                                 {t.word}&nbsp;
