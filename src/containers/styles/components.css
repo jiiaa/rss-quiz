@@ -1,3 +1,7 @@
 span.head {
     font-weight: bold;
 }
+
+div.card {
+    margin-top: 20px;
+}

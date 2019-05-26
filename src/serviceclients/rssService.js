@@ -9,16 +9,16 @@ const yleInEngishUrl = "https://feeds.yle.fi/uutiset/v1/recent.rss?publisherIds=
 
 var rssFeed = [];
 
-export async function yleMostRead(callback) {
-    let feed = await parser.parseURL(CORS_PROXY + yleMostReadUrl);
+export async function yleMajorNews(callback) {
+    let feed = await parser.parseURL(CORS_PROXY + yleMajorNewsUrl);
     feed.items.forEach(item => {
-        rssFeed.push(item.title)
+        rssFeed.push({title: item.title, link: item.link});
     })
     callback (rssFeed);
 };
 
-export async function yleMajorNews(callback) {
-    let feed = await parser.parseURL(CORS_PROXY + yleMajorNewsUrl);
+export async function yleMostRead(callback) {
+    let feed = await parser.parseURL(CORS_PROXY + yleMostReadUrl);
     feed.items.forEach(item => {
         rssFeed.push(item.title)
     })

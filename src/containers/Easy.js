@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { MDBBadge, MDBCol, MDBContainer, MDBRow } from 'mdbreact';
+import { MDBBadge, MDBCard, MDBCardHeader, MDBCol, MDBContainer, MDBRow, MDBCardBody } from 'mdbreact';
 import Latency from '../components/Latency';
 import AnswerTitle from '../components/AnswerTitle';
 import NewsMenu from '../components/NewsMenu';
@@ -13,6 +13,7 @@ let referenceResult = [];
 let randomIndexes = [];
 let totalScore = 0;
 let userScore = 0;
+let articleLink = "";
 
 const spanStyle = {
   backgroundColor: "lightblue",
@@ -30,7 +31,7 @@ export default class Easy extends Component {
   };
 
   componentDidMount() {
-  //   this.getNewsTitles();
+    //   this.getNewsTitles();
   }
 
   getYleMajorNews = e => {
@@ -82,9 +83,11 @@ export default class Easy extends Component {
     let randomTitleArray = [];
     let randomIndex = Math.floor(Math.random() * allTitles.length);
     let cache = allTitles.splice(randomIndex, 1);
-    let cacheTitleArray = cache[0].split(" ");
+    articleLink = cache[0].link;
+    let cacheTitleArray = cache[0].title.split(" ");
+    console.log("cacheTitleArray: ", cacheTitleArray);
     cacheTitleArray.forEach((item, index) => {
-      randomTitleArray.push({ index: index, word: item });
+      randomTitleArray.push({ index: index, word: item});
     });
     referenceResult = [...randomTitleArray];
     randomIndexes = this.getRandomIndexes(randomTitleArray.length);
@@ -169,10 +172,11 @@ export default class Easy extends Component {
       />
     )
   }
-  renderAnswerTitle() {
+  renderAnswerTitle(title, link) {
     return (
       <AnswerTitle
-        title={this.state.title}
+        title={title}
+        newsLink = {link}
       />
     )
   }
@@ -220,23 +224,38 @@ export default class Easy extends Component {
             <MDBCol>
               <div>{this.renderNewsMenu()}</div>
             </MDBCol>
-            <MDBCol size="8">
-              {this.state.spinner ? <Latency />
-                : <>{this.state.isAnswer ? <div><span className="head">Quiz Result</span></div> : <div><span className="head">Quiz News Title</span></div>}</>
-              }
-              {this.state.isAnswer
-                ? this.renderAnswerTitle()
-                : <div>
-                  <p>{quizTitle}</p>
-                  <p>{quizWord}</p>
-                </div>
-              }
-              <div>
-                {this.state.isAnswer
-                  ? <button onClick={() => this.getQuizTitle()}>Next</button>
-                  : <button color="info" onClick={() => this.checkResult()}>Verify</button>
-                }
-              </div>
+            <MDBCol size="7">
+              <MDBCard>
+                <MDBCardHeader color="primary-color">
+                  {this.state.isAnswer
+                    ? <div><span className="head">Quiz Result</span></div>
+                    : <div><span className="head">Quiz News Title</span></div>
+                  }
+                </MDBCardHeader>
+                <MDBCardBody>
+                  {this.state.spinner ? <div><Latency /></div>
+                    : <></>
+                  }
+                  {this.state.isAnswer
+                    ? this.renderAnswerTitle(this.state.title, articleLink)
+                    : <div>
+                      <p>{quizTitle}</p>
+                      <p>{quizWord}</p>
+                    </div>
+                  }
+                  <div>
+                    {this.state.title.length === 0
+                      ? <div>
+                          Please, choose the news topic on the left first.
+                        </div>
+                      : <>{this.state.isAnswer
+                          ? <button onClick={() => this.getQuizTitle()}>Next</button>
+                          : <button color="info" onClick={() => this.checkResult()}>Verify</button>
+                        }</>
+                    }
+                  </div>
+                </MDBCardBody>
+              </MDBCard>
             </MDBCol>
             <MDBCol>
               <div>{this.renderResultScore(userScore, totalScore)}</div>

@@ -1,24 +1,26 @@
 import React from 'react'
-import { MDBContainer, MDBRow } from 'mdbreact';
+import { MDBCard, MDBCardHeader, MDBContainer, MDBBadge } from 'mdbreact';
 const NewsMenu = props => {
 
     return (
         <MDBContainer>
-            <div>
-                <span className="head">NewsMenu</span>
-            </div>
-            <div>
-                <span onClick={props.yleMajorNews}>Get Yle Major News</span>
-            </div>
-            <div>
-                <span onClick={props.yleMostRead}>Get Yle Most Read News</span>
-            </div>
-            <div>
-                <span onClick={props.yleFinancial}>Get Yle Financial News</span>
-            </div>
-            <div>
-                <span onClick={props.yleInEnglish}>Get Yle News in English</span>
-            </div>
+            <MDBCard>
+                <MDBCardHeader  color="primary-color">
+                    <span className="head">NewsMenu</span>
+                </MDBCardHeader>
+                <div>
+                    <MDBBadge onClick={props.yleMajorNews}>Get Yle Major News</MDBBadge>
+                </div>
+                <div>
+                <MDBBadge onClick={props.yleMostRead}>Get Yle Most Read News</MDBBadge>
+                </div>
+                <div>
+                <MDBBadge onClick={props.yleFinancial}>Get Yle Financial News</MDBBadge>
+                </div>
+                <div>
+                <MDBBadge onClick={props.yleInEnglish}>Get Yle News in English</MDBBadge>
+                </div>
+            </MDBCard>
         </MDBContainer>
     )
 }
