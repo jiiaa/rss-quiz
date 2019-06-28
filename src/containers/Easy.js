@@ -4,15 +4,13 @@ import Latency from '../components/Latency';
 import AnswerTitle from '../components/AnswerTitle';
 import NewsMenu from '../components/NewsMenu';
 import ResultScore from '../components/ResultScore';
-import { yleMajorNews, yleMostRead, yleFinancial, yleNewsInEnglish } from '../serviceclients/rssService';
-import './styles/easy.css';
+import { yleMajorNews, yleMostRead, yleFinancial, yleNewsInEnglish, iltalehtiEntertainment } from '../serviceclients/rssService';
+import { getRssYle } from '../serviceclients/serviceClient';
 import '../containers/styles/components.css';
 
 let allTitles = [];
 let referenceResult = [];
 let randomIndexes = [];
-let totalScore = 0;
-let userScore = 0;
 let articleLink = "";
 
 const spanStyle = {
@@ -24,9 +22,13 @@ const spanStyle = {
 export default class Easy extends Component {
   state = {
     isAnswer: false,
-    resultScore: 0,
     spinner: false,
     title: [],
+    userScore: {
+      score: 0,
+      strikes: 0,
+      total: 0,
+    },
     words: [],
   };
 
@@ -35,8 +37,10 @@ export default class Easy extends Component {
   }
 
   getYleMajorNews = e => {
+    const url = { url: e.target.id };
     this.setState({ title: [], words: [], spinner: true });
-    yleMajorNews(response => {
+    getRssYle(url, response => {
+      console.log("response: ", response);
       allTitles = response;
       this.getQuizTitle();
     })
@@ -66,6 +70,14 @@ export default class Easy extends Component {
     })
   };
 
+  getIltalehtiEntertainment = e => {
+    this.setState({ title: [], words: [], spinner: true });
+    iltalehtiEntertainment(response => {
+      allTitles = response;
+      this.getQuizTitle();
+    })
+  };
+
   getRandomIndexes = (amount) => {
     let rndIndexes = [];
     let randomNumber;
@@ -85,7 +97,6 @@ export default class Easy extends Component {
     let cache = allTitles.splice(randomIndex, 1);
     articleLink = cache[0].link;
     let cacheTitleArray = cache[0].title.split(" ");
-    console.log("cacheTitleArray: ", cacheTitleArray);
     cacheTitleArray.forEach((item, index) => {
       randomTitleArray.push({ index: index, word: item});
     });
@@ -149,17 +160,19 @@ export default class Easy extends Component {
 
   checkResult = () => {
     let userAnswer = [...this.state.title];
+    let userScore = {...userScore};
     for (let i = 0; i < randomIndexes.length; ++i) {
       if (userAnswer[randomIndexes[i]].word === referenceResult[randomIndexes[i]].word) {
         userAnswer[randomIndexes[i]].index = 88;
-        userScore++;
-        totalScore++;
+        userScore.score++;
+        userScore.total++;
       } else {
         userAnswer[randomIndexes[i]].index = 99;
-        totalScore++;
+        userScore.strikes++;
+        userScore.total++;
       }
     }
-    this.setState({ title: userAnswer, words: [], isAnswer: true });
+    this.setState({ userScore, title: userAnswer, words: [], isAnswer: true });
   }
 
   renderNewsMenu() {
@@ -169,6 +182,7 @@ export default class Easy extends Component {
         yleMostRead={this.getYleMostRead}
         yleFinancial={this.getYleFinancial}
         yleInEnglish={this.getYleInEnglish}
+        iltalehtiEnt={this.getIltalehtiEntertainment}
       />
     )
   }
@@ -181,11 +195,10 @@ export default class Easy extends Component {
     )
   }
 
-  renderResultScore(uScore, tScore) {
+  renderResultScore(userScore) {
     return (
       <ResultScore
-        userScore={uScore}
-        totalScore={tScore}
+        userScore={userScore}
       />
     )
   }
@@ -258,7 +271,7 @@ export default class Easy extends Component {
               </MDBCard>
             </MDBCol>
             <MDBCol>
-              <div>{this.renderResultScore(userScore, totalScore)}</div>
+              <div>{this.renderResultScore(this.state.userScore)}</div>
             </MDBCol>
           </MDBRow>
         </MDBContainer>

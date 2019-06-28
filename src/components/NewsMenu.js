@@ -5,23 +5,29 @@ const NewsMenu = props => {
     return (
         <MDBContainer>
             <MDBCard>
-                <MDBCardHeader  color="primary-color">
+                <MDBCardHeader color="primary-color">
                     <span className="head">NewsMenu</span>
                 </MDBCardHeader>
                 <div>
-                    <MDBBadge onClick={props.yleMajorNews}>Get Yle Major News</MDBBadge>
+                    <MDBBadge id="majorHeadlines/YLE_UUTISET.rss" onClick={props.yleMajorNews}>Yle pääuutiset</MDBBadge>
                 </div>
                 <div>
-                <MDBBadge onClick={props.yleMostRead}>Get Yle Most Read News</MDBBadge>
+                    <MDBBadge id="mostRead/YLE_UUTISET.rss" onClick={props.yleMostRead}>Yle luetuimmat</MDBBadge>
                 </div>
                 <div>
-                <MDBBadge onClick={props.yleFinancial}>Get Yle Financial News</MDBBadge>
+                    <MDBBadge id="recent.rss?publisherIds=YLE_UUTISET&concepts=18-19274" onClick={props.yleFinancial}>Yle talous</MDBBadge>
                 </div>
                 <div>
-                <MDBBadge onClick={props.yleInEnglish}>Get Yle News in English</MDBBadge>
+                    <MDBBadge id="recent.rss?publisherIds=YLE_NEWS" onClick={props.yleInEnglish}>Yle News in English</MDBBadge>
+                </div>
+                <div>
+                    <MDBBadge id="rss/digi.xml" onClick={props.iltalehtiEnt}>Iltalehti digi & tech</MDBBadge>
+                </div>
+                <div>
+                    <MDBBadge id="rss/viihde.xml" onClick={props.iltalehtiEnt}>Iltalehti viihde</MDBBadge>
                 </div>
             </MDBCard>
-        </MDBContainer>
+        </MDBContainer >
     )
 }
 
