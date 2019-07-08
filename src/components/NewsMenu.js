@@ -9,22 +9,22 @@ const NewsMenu = props => {
                     <span className="head">NewsMenu</span>
                 </MDBCardHeader>
                 <div>
-                    <MDBBadge id="majorHeadlines/YLE_UUTISET.rss" onClick={props.yleMajorNews}>Yle pääuutiset</MDBBadge>
+                    <MDBBadge id="majorHeadlines/YLE_UUTISET.rss" onClick={props.yleNews}>Yle pääuutiset</MDBBadge>
                 </div>
                 <div>
-                    <MDBBadge id="mostRead/YLE_UUTISET.rss" onClick={props.yleMostRead}>Yle luetuimmat</MDBBadge>
+                    <MDBBadge id="mostRead/YLE_UUTISET.rss" onClick={props.yleNews}>Yle luetuimmat</MDBBadge>
                 </div>
                 <div>
-                    <MDBBadge id="recent.rss?publisherIds=YLE_UUTISET&concepts=18-19274" onClick={props.yleFinancial}>Yle talous</MDBBadge>
+                    <MDBBadge id="recent.rss?publisherIds=YLE_UUTISET&concepts=18-19274" onClick={props.yleNews}>Yle talous</MDBBadge>
                 </div>
                 <div>
-                    <MDBBadge id="recent.rss?publisherIds=YLE_NEWS" onClick={props.yleInEnglish}>Yle News in English</MDBBadge>
+                    <MDBBadge id="recent.rss?publisherIds=YLE_NEWS" onClick={props.yleNews}>Yle News in English</MDBBadge>
                 </div>
                 <div>
-                    <MDBBadge id="rss/digi.xml" onClick={props.iltalehtiEnt}>Iltalehti digi & tech</MDBBadge>
+                    <MDBBadge id="digi.xml" onClick={props.iltalehti}>Iltalehti digi & tech</MDBBadge>
                 </div>
                 <div>
-                    <MDBBadge id="rss/viihde.xml" onClick={props.iltalehtiEnt}>Iltalehti viihde</MDBBadge>
+                    <MDBBadge id="viihde.xml" onClick={props.iltalehti}>Iltalehti viihde</MDBBadge>
                 </div>
             </MDBCard>
         </MDBContainer >

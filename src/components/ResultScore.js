@@ -15,10 +15,10 @@ const ResultScore = props => {
                 Score: <MDBBadge>{score}</MDBBadge>
                 </div>
                 <div>
-                Strikes: <MDBBadge>{strikes}</MDBBadge>
+                Strikes: <MDBBadge>{strikes}</MDBBadge> / <MDBBadge>3</MDBBadge>
                 </div>
                 <div>
-                Out of: <MDBBadge>{total}</MDBBadge>
+                Out of total: <MDBBadge>{total}</MDBBadge>
                 </div>
             </MDBCard>
         </MDBContainer>

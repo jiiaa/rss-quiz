@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
+import { Redirect } from 'react-router-dom'
 import { MDBBadge, MDBCard, MDBCardHeader, MDBCol, MDBContainer, MDBRow, MDBCardBody } from 'mdbreact';
 import Latency from '../components/Latency';
 import AnswerTitle from '../components/AnswerTitle';
 import NewsMenu from '../components/NewsMenu';
 import ResultScore from '../components/ResultScore';
-import { yleMajorNews, yleMostRead, yleFinancial, yleNewsInEnglish, iltalehtiEntertainment } from '../serviceclients/rssService';
-import { getRssYle } from '../serviceclients/serviceClient';
+import { getRssYle, getRssIl } from '../serviceclients/serviceClient';
 import '../containers/styles/components.css';
 
 let allTitles = [];
@@ -23,6 +23,7 @@ export default class Easy extends Component {
   state = {
     isAnswer: false,
     spinner: false,
+    strikesOut: false,
     title: [],
     userScore: {
       score: 0,
@@ -36,43 +37,21 @@ export default class Easy extends Component {
     //   this.getNewsTitles();
   }
 
-  getYleMajorNews = e => {
+  getYleNews = e => {
     const url = { url: e.target.id };
     this.setState({ title: [], words: [], spinner: true });
     getRssYle(url, response => {
-      console.log("response: ", response);
+      allTitles = [];
       allTitles = response;
       this.getQuizTitle();
     })
   };
 
-  getYleMostRead = e => {
+  getIltalehti = e => {
+    const url = { url: e.target.id };
     this.setState({ title: [], words: [], spinner: true });
-    yleMostRead(response => {
-      allTitles = response;
-      this.getQuizTitle();
-    })
-  };
-
-  getYleFinancial = e => {
-    this.setState({ title: [], words: [], spinner: true });
-    yleFinancial(response => {
-      allTitles = response;
-      this.getQuizTitle();
-    })
-  };
-
-  getYleInEnglish = e => {
-    this.setState({ title: [], words: [], spinner: true });
-    yleNewsInEnglish(response => {
-      allTitles = response;
-      this.getQuizTitle();
-    })
-  };
-
-  getIltalehtiEntertainment = e => {
-    this.setState({ title: [], words: [], spinner: true });
-    iltalehtiEntertainment(response => {
+    getRssIl(url, response => {
+      allTitles = [];
       allTitles = response;
       this.getQuizTitle();
     })
@@ -160,7 +139,7 @@ export default class Easy extends Component {
 
   checkResult = () => {
     let userAnswer = [...this.state.title];
-    let userScore = {...userScore};
+    let userScore = {...this.state.userScore};
     for (let i = 0; i < randomIndexes.length; ++i) {
       if (userAnswer[randomIndexes[i]].word === referenceResult[randomIndexes[i]].word) {
         userAnswer[randomIndexes[i]].index = 88;
@@ -172,17 +151,17 @@ export default class Easy extends Component {
         userScore.total++;
       }
     }
+    if ( userScore.strikes >= 3 ) {
+      this.setState({ strikesOut: true, userScore, title: userAnswer, words: [], isAnswer: true });
+    }
     this.setState({ userScore, title: userAnswer, words: [], isAnswer: true });
   }
 
   renderNewsMenu() {
     return (
       <NewsMenu
-        yleMajorNews={this.getYleMajorNews}
-        yleMostRead={this.getYleMostRead}
-        yleFinancial={this.getYleFinancial}
-        yleInEnglish={this.getYleInEnglish}
-        iltalehtiEnt={this.getIltalehtiEntertainment}
+        yleNews={this.getYleNews}
+        iltalehti={this.getIltalehti}
       />
     )
   }
@@ -232,6 +211,11 @@ export default class Easy extends Component {
 
     return (
       <>
+        { this.state.strikesOut && <Redirect to={{
+          pathname: '/scores',
+          state: { userScore: this.state.userScore }
+          }} />
+        }
         <MDBContainer>
           <MDBRow>
             <MDBCol>
